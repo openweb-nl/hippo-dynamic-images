@@ -11,8 +11,8 @@ With this plugin image sizes are defined in the view template and variants are g
 
 ## Installation
 1. Add dependency to pom.xml
-
-`    <dependency>
+```xml    
+<dependency>
       <groupId>nl.openweb.hippo</groupId>
       <artifactId>dynamic-images</artifactId>
       <version>0.01.00-SNAPSHOT</version>
@@ -20,11 +20,12 @@ With this plugin image sizes are defined in the view template and variants are g
     <dependency>
       <groupId>org.onehippo.cms7</groupId>
       <artifactId>hippo-cms-gallery-frontend</artifactId>
-    </dependency>`
-    
-2. Add a Spring configuration file in hst-assembly/overrides.
+    </dependency>
+   ```
 
-`<?xml version="1.0" encoding="UTF-8"?>
+2. Add a Spring configuration file in hst-assembly/overrides.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
@@ -37,17 +38,20 @@ With this plugin image sizes are defined in the view template and variants are g
     <property name="timeoutMilliseconds" value="1000"/>
     <property name="variantStrategy" ref="nl.openweb.hippo.dynamicimage.strategy.VariantStrategy"/>
   </bean>
-</beans>`
-
+</beans>
+```
 As you can see it's possible to customize the timeout and the various classes. Also the ScalingGalleryProcessor can be overwritten and set with Spring configuration on the VariantStrategy.
 
+3. Add taglib for JSP
+```
+<%@ taglib prefix="dynimg" uri="http://www.openweb.nl/hippo/dynamicimages/taglib" %>
+```
+Or import taglib for use in Freemarker webfiles
+```
+<#assign dynimg=JspTaglibs["http://www.finalist.nl/hippo/dynamicimages/taglib"] >
+```
 
-3. Add taglib for JSP.
-
-`<%@ taglib prefix="dynimg" uri="http://www.openweb.nl/hippo/dynamicimages/taglib" %>`
-
-4. Add group sitewriters to domain hippogallery
-
+4. Add group _sitewriters_ to domain _hippogallery_
 Add value `sitewriters` to property `hipposys:groups` at path=/hippo:configuration/hippo:domains/hippogallery/hippo:authrole
 
 ## Usage
