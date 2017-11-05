@@ -18,7 +18,7 @@
 
     <groupId>nl.openweb.hippo</groupId>
     <artifactId>dynamic-images</artifactId>
-    <version>1.00.00</version>
+    <version>0.01.00-SNAPSHOT</version>
 
     <name>openweb-dynamic-images</name>
 
@@ -198,7 +198,7 @@
         <connection>scm:git:git@github.com:openweb-nl/hippo-dynamic-images.git</connection>
         <developerConnection>scm:git:git@github.com:openweb-nl/hippo-dynamic-images.git</developerConnection>
         <url>https://github.com/openweb-nl/hippo-dynamic-images</url>
-        <tag>dynamic-images-1.00.00</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
