@@ -12,7 +12,7 @@ With this plugin image sizes are defined in the view template and variants are g
 ## Installation
 1. Add dependency to pom.xml
 ```xml    
-<dependency>
+    <dependency>
       <groupId>nl.openweb.hippo</groupId>
       <artifactId>dynamic-images</artifactId>
       <version>0.01.00-SNAPSHOT</version>
@@ -21,7 +21,7 @@ With this plugin image sizes are defined in the view template and variants are g
       <groupId>org.onehippo.cms7</groupId>
       <artifactId>hippo-cms-gallery-frontend</artifactId>
     </dependency>
-   ```
+```
 
 2. Add a Spring configuration file in hst-assembly/overrides.
 ```xml
@@ -52,6 +52,7 @@ Or import taglib for use in Freemarker webfiles
 ```
 
 4. Add group _sitewriters_ to domain _hippogallery_
+
 Add value `sitewriters` to property `hipposys:groups` at path=/hippo:configuration/hippo:domains/hippogallery/hippo:authrole
 
 ## Usage
