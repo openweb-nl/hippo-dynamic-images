@@ -1,6 +1,5 @@
 package nl.openweb.hippo.dynamicimage;
 
-import nl.openweb.hippo.dynamicimage.service.DefaultVariantService;
 import nl.openweb.hippo.dynamicimage.service.VariantService;
 import org.hippoecm.hst.content.beans.standard.HippoGalleryImageBean;
 import org.hippoecm.hst.site.HstServices;
@@ -25,8 +24,7 @@ public class DynamicImageLinkTag extends HstLinkTag {
 
     private Integer width;
     private Integer height;
-    private transient HippoGalleryImageBean imageBean;
-    private final DefaultVariantService service = new DefaultVariantService();
+    private transient HippoGalleryImageBean imagebean;
 
     @Override
     public int doEndTag() throws JspException {
@@ -37,21 +35,23 @@ public class DynamicImageLinkTag extends HstLinkTag {
 
         if (variantService != null) {
             try {
-                Node variantNode = variantService.getOrCreateVariant(getImageBean(), getWidth(), getHeight());
+                Node variantNode = variantService.getOrCreateVariant(getImagebean(), getWidth(), getHeight());
 
                 if (variantNode != null) {
                     try {
                         String name = variantNode.getName();
-                        setHippobean(getImageBean().getParentBean().getBean(name, HippoGalleryImageBean.class));
+                        setHippobean(getImagebean().getParentBean().getBean(name, HippoGalleryImageBean.class));
                     } catch (RepositoryException e) {
                         LOG.error("Failed to create image variant.", e);
                     }
                 } else {
-                    LOG.error("Failed to create image variant.");
+                    LOG.error("Failed to create image variant. No image will be available.");
                 }
             } catch (RepositoryException e) {
-                e.printStackTrace();
+                LOG.error("Failed to get variant", e);
             }
+        } else {
+            LOG.warn("No VariantService found in Spring context");
         }
 
         LOG.trace("Image processing took " + (System.currentTimeMillis() - time) + " ms extra");
@@ -63,13 +63,13 @@ public class DynamicImageLinkTag extends HstLinkTag {
         super.cleanup();
         width = null;
         height = null;
-        imageBean = null;
+        imagebean = null;
     }
 
     /**
      * get the width, defaults to zero
      * 
-     * @return
+     * @return the width, defaults to zero
      */
     public Integer getWidth() {
         return width == null ? 0 : width;
@@ -82,7 +82,7 @@ public class DynamicImageLinkTag extends HstLinkTag {
     /**
      * get the height, defaults to zero
      * 
-     * @return
+     * @return the height, defaults to zero
      */
     public Integer getHeight() {
         return height == null ? 0 : height;
@@ -92,12 +92,12 @@ public class DynamicImageLinkTag extends HstLinkTag {
         this.height = height;
     }
 
-    public HippoGalleryImageBean getImageBean() {
-        return imageBean;
+    public HippoGalleryImageBean getImagebean() {
+        return imagebean;
     }
     
-    public void setImageBean(HippoGalleryImageBean imageBean) {
-        this.imageBean = imageBean;
+    public void setImagebean(HippoGalleryImageBean imagebean) {
+        this.imagebean = imagebean;
     }
 
 }

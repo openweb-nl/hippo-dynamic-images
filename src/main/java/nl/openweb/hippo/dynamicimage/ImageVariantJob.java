@@ -41,15 +41,15 @@ public class ImageVariantJob  extends RepositoryJob<Node> {
         this.variantName = variantName;
     }
 
-    public Node doJob(Session session) {
+    @Override
+    public Node doJob(Session session)  throws JobExecutionException{
         try {
             // get the node in the writable session
             Node node = session.getNodeByIdentifier(sourceVariantNode.getIdentifier());
             return variantStrategy.createVariant(node, variantName, width, height);
         } catch (RepositoryException e) {
-            LOG.error("Failed to create dynamic imagevariant", e);
+            throw new JobExecutionException("Failed to create dynamic imagevariant", e);
         }
-        return null;
     }
 
 }

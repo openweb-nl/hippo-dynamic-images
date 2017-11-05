@@ -7,16 +7,16 @@
           http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd
         ">
     <tlib-version>1.0</tlib-version>
-    <short-name>dynim</short-name>
+    <short-name>dynimg</short-name>
     <uri>http://www.openweb.nl/hippo/dynamicimages/taglib</uri>
     <tag>
         <description>Dynamic image link</description>
-        <name>dynamicImageLink</name>
+        <name>link</name>
         <tag-class>nl.openweb.hippo.dynamicimage.DynamicImageLinkTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
-            <description>The imageBean (variant) on which the dynamic image will be based</description>
-            <name>imageBean</name>
+            <description>The imagebean (variant) on which the dynamic image will be based</description>
+            <name>imagebean</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
             <type>org.hippoecm.hst.content.beans.standard.HippoGalleryImageBean</type>

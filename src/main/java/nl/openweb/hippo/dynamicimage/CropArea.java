@@ -13,7 +13,7 @@ public class CropArea {
     private int y;
 
     /**
-     * calculeted optimal crop area
+     * calculated optimal crop area
      * @param sourceWidth
      * @param sourceHeight
      * @param targetWidth

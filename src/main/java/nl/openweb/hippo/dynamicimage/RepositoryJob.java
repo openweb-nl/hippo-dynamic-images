@@ -25,16 +25,25 @@ public abstract class RepositoryJob<V> implements Callable<V> {
     public V call() throws JobExecutionException {
         long time0 = System.currentTimeMillis();
         Session session = getSession();
-        long time1 = System.currentTimeMillis();
-        long time2;
-        V result = doJob(session);
-        time2 = System.currentTimeMillis();
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Timing of job. getSession=" + (time1 - time0) + "ms. doJob=" + (time2 - time1)
-                    + "ms. Total=" + (time2 - time0) + "ms");
-        }
+        try {
+            long time1 = System.currentTimeMillis();
+            long time2;
+            V result = doJob(session);
+            time2 = System.currentTimeMillis();
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Timing of job. getSession=" + (time1 - time0) + "ms. doJob=" + (time2 - time1)
+                        + "ms. Total=" + (time2 - time0) + "ms");
+            }
 
-        return result;
+            try {
+                session.save();
+            } catch (RepositoryException e) {
+                throw new JobExecutionException("Failed to save the session", e);
+            }
+            return result;
+        } finally {
+            session.logout();
+        }
     }
 
     /**
@@ -42,15 +51,17 @@ public abstract class RepositoryJob<V> implements Callable<V> {
      * 
      * @param session:
      *            a valid session. The session is removed after the job has finished.
-     * @return
+     * @return the return object of type V
      * @throws JobExecutionException
      */
     public abstract V doJob(Session session) throws JobExecutionException;
 
     /**
-     * Sessions are retrieved from a pooled session. "Developers do not need to take care of logging them out."
-     * @return
-     * @throws JobExecutionException
+     * Sessions are retrieved from a pooled session. The documentation says "Developers do not need to take care of logging them out."
+     * But when you don't close it you'll get "WARN [org.apache.jackrabbit.core.SessionImpl] Unclosed session detected."
+     * So please close the session after use
+     * @return a Session
+     * @throws JobExecutionException when failed to login to repository
      */
     private Session getSession() throws JobExecutionException {
         Credentials writeCred = getCredentials();
@@ -68,7 +79,7 @@ public abstract class RepositoryJob<V> implements Callable<V> {
      */
     protected Credentials getCredentials() {
         ComponentManager componentManager = HstServices.getComponentManager();
-        return componentManager.<Credentials> getComponent(Credentials.class.getName() + ".writable");
+        return componentManager.getComponent(Credentials.class.getName() + ".writable");
     }
 
 

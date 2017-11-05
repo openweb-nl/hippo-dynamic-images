@@ -26,11 +26,13 @@ import java.util.GregorianCalendar;
 public class CenteredVariantStrategy implements VariantStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(CenteredVariantStrategy.class);
     protected static final float EPSILON = 0.000001f;
+    private ScalingGalleryProcessor galleryProcessor;
+
 
     @Override
     public Node createVariant(Node sourceVariantNode, String variantName, int width, int height) throws RepositoryException {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Image format node {} not found; creating it now", variantName);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Image variant node {} not found; creating it now", variantName);
         }
         Node node = sourceVariantNode.getParent();
         Node newVariantNode = node.addNode(variantName, HippoGalleryNodeType.IMAGE);
@@ -41,11 +43,11 @@ public class CenteredVariantStrategy implements VariantStrategy {
         return newVariantNode;
     }
 
-    private void setImage(Node newVariantNode, Node sourceVariantNode, int width, int height) throws RepositoryException {
+    protected void setImage(Node newVariantNode, Node sourceVariantNode, int width, int height) throws RepositoryException {
         String originalFileName = getOrCreateFileName(sourceVariantNode.getParent());
-        ScalingGalleryProcessor processor = new ScalingGalleryProcessor();
+        ScalingGalleryProcessor processor = getGalleryProcessor();
 
-        Calendar lastModified = new GregorianCalendar();
+
         InputStream imageStream = getData(sourceVariantNode);
         String mimeType = getMimeType(sourceVariantNode);
         if (width > 0 && height > 0) {
@@ -56,6 +58,7 @@ public class CenteredVariantStrategy implements VariantStrategy {
         }else{
             processor.addScalingParameters(newVariantNode.getName(), new ScalingParameters(width, height, true));
         }
+        Calendar lastModified = new GregorianCalendar();
         processor.initGalleryResource(newVariantNode, imageStream, mimeType, originalFileName, lastModified);
     }
 
@@ -111,5 +114,17 @@ public class CenteredVariantStrategy implements VariantStrategy {
 
     private InputStream getData(Node node) throws RepositoryException {
         return node.getProperty(JcrConstants.JCR_DATA).getBinary().getStream();
+    }
+
+    public ScalingGalleryProcessor getGalleryProcessor() {
+        if (galleryProcessor == null) {
+            LOG.info("No galleryProcessor was set. Using default ScalingGalleryProcessor");
+            galleryProcessor = new ScalingGalleryProcessor();
+        }
+        return galleryProcessor;
+    }
+
+    public void setGalleryProcessor(ScalingGalleryProcessor galleryProcessor) {
+        this.galleryProcessor = galleryProcessor;
     }
 }

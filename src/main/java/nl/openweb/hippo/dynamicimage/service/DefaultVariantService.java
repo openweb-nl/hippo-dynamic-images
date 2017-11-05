@@ -56,7 +56,7 @@ public class DefaultVariantService implements VariantService {
         try {
             return createVariant(sourceVariant, width, height, variantName);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOG.error("Failed to create or update image variant at "+ sourceVariant.getPath() + "/" + variantName);
+            LOG.error("Failed to create or update image variant at "+ sourceVariant.getPath() + "/" + variantName, e);
             return null;
         }
     }
@@ -65,9 +65,14 @@ public class DefaultVariantService implements VariantService {
         ImageVariantJob job = new ImageVariantJob(getVariantStrategy(), sourceVariant.getNode(), variantName, width, height);
 
         final ExecutorService executor = Executors.newSingleThreadExecutor();
+        long time0 = System.currentTimeMillis();
         final Future<Node> future = executor.submit(job);
         executor.shutdown(); // This does not cancel the already-scheduled task.
-        return future.get(getTimeoutMilliseconds(), TimeUnit.MILLISECONDS);
+        Node node = future.get(getTimeoutMilliseconds(), TimeUnit.MILLISECONDS);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("ImageVariantJob took " + (System.currentTimeMillis() - time0) + "ms to complete and return " + node);
+        }
+        return node;
     }
 
     /**
@@ -100,9 +105,9 @@ public class DefaultVariantService implements VariantService {
     /**
      * get the name of the node the image would be stored under
      *
-     * @param width
-     * @param height
-     * @return
+     * @param width Width of the new variant
+     * @param height Height of the new variant
+     * @return the name of the node where the variant is stored
      */
     String getVariantName(String sourceVariantName, Integer width, Integer height) {
         if ((width == null || width <= 0) && (height == null || height <= 0)) {
