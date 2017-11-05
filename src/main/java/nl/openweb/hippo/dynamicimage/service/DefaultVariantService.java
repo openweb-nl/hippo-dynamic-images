@@ -12,6 +12,10 @@ import javax.jcr.RepositoryException;
 import java.util.Calendar;
 import java.util.concurrent.*;
 
+/**
+ * Default service for creating image variants
+ * @author Ivor Boers
+ */
 public class DefaultVariantService implements VariantService {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultVariantService.class);
     public static final String JCR_LAST_MODIFIED = "jcr:lastModified";
@@ -70,7 +74,8 @@ public class DefaultVariantService implements VariantService {
         executor.shutdown(); // This does not cancel the already-scheduled task.
         Node node = future.get(getTimeoutMilliseconds(), TimeUnit.MILLISECONDS);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("ImageVariantJob took " + (System.currentTimeMillis() - time0) + "ms to complete and return " + node);
+            LOG.trace("ImageVariantJob took " + (System.currentTimeMillis() - time0) + "ms to complete and return " +
+                    (node == null ? "null" : "a newly created node for the image variant"));
         }
         return node;
     }

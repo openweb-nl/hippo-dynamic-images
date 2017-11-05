@@ -6,7 +6,12 @@ import org.hippoecm.hst.content.beans.standard.HippoGalleryImageBean;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
+/**
+ * Service for creating image variants
+ * @author Ivor Boers
+ */
 public interface VariantService {
+
     void setVariantStrategy(VariantStrategy variantStrategy);
 
     VariantStrategy getVariantStrategy();
