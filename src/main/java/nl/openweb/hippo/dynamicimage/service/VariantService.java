@@ -27,13 +27,33 @@ import javax.jcr.RepositoryException;
  */
 public interface VariantService {
 
+    /**
+     * @param variantStrategy the strategy to use for creating the image variant
+     */
     void setVariantStrategy(VariantStrategy variantStrategy);
 
+    /**
+     * @return the strategy to use for creating the image variant
+     */
     VariantStrategy getVariantStrategy();
 
+    /**
+     * @param timeoutMilliseconds the timeout for creating the image variant in the repository
+     */
     void setTimeoutMilliseconds(int timeoutMilliseconds);
 
+    /**
+     * @return the timeout in milliseconds for creating the image variant in the repository
+     */
     int getTimeoutMilliseconds();
 
+    /**
+     *
+     * @param sourceVariant the existing variant to use as the source
+     * @param width the width of the new variant
+     * @param height the height of the new variant
+     * @return the Node for the
+     * @throws RepositoryException
+     */
     Node getOrCreateVariant(HippoGalleryImageBean sourceVariant, int width, int height) throws RepositoryException;
 }
