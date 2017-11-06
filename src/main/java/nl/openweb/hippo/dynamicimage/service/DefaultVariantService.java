@@ -62,21 +62,26 @@ public class DefaultVariantService implements VariantService {
 
     @Override
     public Node getOrCreateVariant(HippoGalleryImageBean sourceVariant, int width, int height) throws RepositoryException {
-        String variantName = getVariantName(sourceVariant.getNode().getName(), width, height);
-        if (hasVariant(sourceVariant.getParentBean(), variantName)) {
-            Node variantNode = sourceVariant.getParentBean().getNode().getNode(variantName);
 
-            if (needsToBeUpdated(variantNode, sourceVariant.getNode())) {
-                variantNode.remove();
-            } else {
-                return variantNode;
+        Node sourceVariantNode = sourceVariant.getNode();
+        String variantName = getVariantName(sourceVariantNode.getName(), width, height);
+        String key = sourceVariantNode.getParent().getIdentifier() + variantName;
+        synchronized (key.intern()){
+            if (hasVariant(sourceVariantNode, variantName)) {
+                Node variantNode = sourceVariantNode.getParent().getNode(variantName);
+
+                if (needsToBeUpdated(variantNode, sourceVariantNode)) {
+                    variantNode.remove();
+                } else {
+                    return variantNode;
+                }
             }
-        }
-        try {
-            return createVariant(sourceVariant, width, height, variantName);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOG.error("Failed to create or update image variant at "+ sourceVariant.getPath() + "/" + variantName, e);
-            return null;
+            try {
+                return createVariant(sourceVariant, width, height, variantName);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                LOG.error("Failed to create or update image variant at " + sourceVariant.getPath() + "/" + variantName, e);
+                return null;
+            }
         }
     }
 
@@ -118,8 +123,8 @@ public class DefaultVariantService implements VariantService {
         return originalDate.after(formatDate);
     }
 
-    protected boolean hasVariant(HippoBean parentBean, String variantName) throws RepositoryException {
-        return parentBean.getNode().hasNode(variantName);
+    protected boolean hasVariant(Node sourceVariantNode, String variantName) throws RepositoryException {
+        return sourceVariantNode.getParent().hasNode(variantName);
     }
 
     /**
