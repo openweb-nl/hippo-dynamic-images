@@ -1,17 +1,21 @@
 package nl.openweb.hippo.dynamicimage.strategy;
 
-import junit.framework.Assert;
-
+import org.apache.jackrabbit.JcrConstants;
+import org.apache.jackrabbit.value.BinaryImpl;
 import org.hippoecm.frontend.plugins.gallery.imageutil.ImageUtils;
 import org.hippoecm.hst.content.beans.standard.HippoGalleryImageSet;
+import org.hippoecm.repository.gallery.HippoGalleryNodeType;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.imageio.ImageReader;
 import javax.imageio.stream.MemoryCacheImageInputStream;
-
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 
 import static org.mockito.Mockito.*;
 
@@ -19,6 +23,31 @@ public class CenteredVariantStrategyTest {
 
 
     private HippoGalleryImageSet imageSet = mock(HippoGalleryImageSet.class);
+
+
+    @Test
+    public void testCreateVariant() throws RepositoryException {
+        CenteredVariantStrategy strategy = mock(CenteredVariantStrategy.class);
+        doCallRealMethod().when(strategy).createVariant(any(Node.class), anyString(), anyInt(), anyInt());
+
+        Node sourceNode = mock(Node.class);
+        Node sourceNodeParent = mock(Node.class);
+        doReturn(sourceNodeParent).when(sourceNode).getParent();
+
+        Node addedNode = mock(Node.class);
+        String variantName = "foo100x200";
+        doReturn(addedNode).when(sourceNodeParent).addNode(eq(variantName), eq(HippoGalleryNodeType.IMAGE));
+        int width = 100;
+        int height = 250;
+        Node result = strategy.createVariant(sourceNode, variantName, width, height);
+
+        Assert.assertNotNull(result);
+        verify(addedNode).setProperty(eq(JcrConstants.JCR_MIMETYPE), eq("image/jpeg"));
+        verify(addedNode).setProperty(eq(JcrConstants.JCR_DATA), any(BinaryImpl.class));
+        verify(addedNode).setProperty(eq(JcrConstants.JCR_LASTMODIFIED), any(Calendar.class));
+        verify(strategy).setImage(eq(addedNode), eq(sourceNode), eq(width), eq(height));
+
+    }
 
     @Test
     public void testCropLandscapeFromLandscapeImage() {
@@ -129,4 +158,5 @@ public class CenteredVariantStrategyTest {
     private InputStream getImageStream(String resource) {
         return this.getClass().getResourceAsStream(resource);
     }
+
 }

@@ -62,7 +62,6 @@ public class CenteredVariantStrategy implements VariantStrategy {
         String originalFileName = getOrCreateFileName(sourceVariantNode.getParent());
         ScalingGalleryProcessor processor = getGalleryProcessor();
 
-
         InputStream imageStream = getData(sourceVariantNode);
         String mimeType = getMimeType(sourceVariantNode);
         if (width > 0 && height > 0) {
@@ -79,12 +78,7 @@ public class CenteredVariantStrategy implements VariantStrategy {
 
     protected InputStream cropImage(final InputStream data, final String mimeType, int width, int height) {
         try {
-            ImageWriter writer = ImageUtils.getImageWriter(mimeType);
-            ImageReader reader = ImageUtils.getImageReader(mimeType);
-
-            MemoryCacheImageInputStream imageInputStream = new MemoryCacheImageInputStream(data);
-            reader.setInput(imageInputStream);
-            BufferedImage originalImage = reader.read(0);
+            BufferedImage originalImage = getOriginalImage(data, mimeType);
 
             int originalWidth = originalImage.getWidth();
             int originalHeight = originalImage.getHeight();
@@ -101,12 +95,19 @@ public class CenteredVariantStrategy implements VariantStrategy {
                 originalImage = Scalr.crop(originalImage, cropArea.getX(), cropArea.getY(), cropArea.getWidth(),
                         cropArea.getHeight());
             }
-
+            ImageWriter writer = ImageUtils.getImageWriter(mimeType);
             return new ByteArrayInputStream(ImageUtils.writeImage(writer, originalImage).toByteArray());
         } catch (IOException x) {
             LOG.warn("Failed to crop image", x);
         }
         return data;
+    }
+
+    BufferedImage getOriginalImage(InputStream data, String mimeType) throws IOException {
+        ImageReader reader = ImageUtils.getImageReader(mimeType);
+        MemoryCacheImageInputStream imageInputStream = new MemoryCacheImageInputStream(data);
+        reader.setInput(imageInputStream);
+        return reader.read(0);
     }
 
     private String getOrCreateFileName(final Node node) throws RepositoryException {
