@@ -62,9 +62,19 @@ public class DefaultVariantService implements VariantService {
 
     @Override
     public Node getOrCreateVariant(HippoGalleryImageBean sourceVariant, int width, int height) throws RepositoryException {
-
+        // first handle the 90% case where the variant is available
         Node sourceVariantNode = sourceVariant.getNode();
         String variantName = getVariantName(sourceVariantNode.getName(), width, height);
+
+        if (hasVariant(sourceVariantNode, variantName) &&
+                !needsToBeUpdated(sourceVariantNode.getParent().getNode(variantName), sourceVariantNode)) {
+            return sourceVariantNode.getParent().getNode(variantName);
+        }
+        // variant does not exist or needs updating.
+        // synchronize next block of code to prevent multiple threads to create the same variant
+        // recheck hasVariant etc in synchronized block because of other threads
+        // key is a unique String to identify a variant of an imageset
+        // key.intern() is a threadsafe way to get the String from the pool maintained by String.
         String key = sourceVariantNode.getParent().getIdentifier() + variantName;
         synchronized (key.intern()){
             if (hasVariant(sourceVariantNode, variantName)) {
@@ -101,7 +111,8 @@ public class DefaultVariantService implements VariantService {
     }
 
     /**
-     * function to determine if the image needs to be set (again)
+     * determines if the imagevariant needs to be updated. An editor might have cropped the imagevariant
+     * or uploaded a new image, etc.
      *
      * @param dynamicVariant
      *            the (new) node, this could be a node with only a name and an image type
@@ -128,7 +139,7 @@ public class DefaultVariantService implements VariantService {
     }
 
     /**
-     * get the name of the node the image would be stored under
+     * get the name of the node of the dynamic imagevariant
      *
      * @param width Width of the new variant
      * @param height Height of the new variant
