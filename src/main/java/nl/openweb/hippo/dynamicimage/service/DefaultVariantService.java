@@ -121,7 +121,7 @@ public class DefaultVariantService implements VariantService {
      * @return whether the image should be created or updated
      * @throws RepositoryException
      */
-    boolean needsToBeUpdated(Node dynamicVariant, Node sourceVariant) throws RepositoryException {
+    protected boolean needsToBeUpdated(Node dynamicVariant, Node sourceVariant) throws RepositoryException {
         if (dynamicVariant == null || !dynamicVariant.hasProperty(JCR_LAST_MODIFIED)) {
             return true;
         }
