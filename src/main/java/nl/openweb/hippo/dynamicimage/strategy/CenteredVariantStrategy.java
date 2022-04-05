@@ -21,6 +21,7 @@ import org.apache.jackrabbit.value.BinaryImpl;
 import org.hippoecm.frontend.plugins.gallery.imageutil.ImageUtils;
 import org.hippoecm.frontend.plugins.gallery.imageutil.ScalingParameters;
 import org.hippoecm.frontend.plugins.gallery.processor.ScalingGalleryProcessor;
+import org.hippoecm.repository.HippoStdNodeType;
 import org.hippoecm.repository.gallery.HippoGalleryNodeType;
 import org.imgscalr.Scalr;
 import org.slf4j.Logger;

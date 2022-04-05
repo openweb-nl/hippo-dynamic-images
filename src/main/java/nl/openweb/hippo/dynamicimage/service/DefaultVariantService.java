@@ -16,8 +16,8 @@
 package nl.openweb.hippo.dynamicimage.service;
 
 import nl.openweb.hippo.dynamicimage.ImageVariantJob;
+import nl.openweb.hippo.dynamicimage.RemoveImageVariantJob;
 import nl.openweb.hippo.dynamicimage.strategy.VariantStrategy;
-import org.hippoecm.hst.content.beans.standard.HippoBean;
 import org.hippoecm.hst.content.beans.standard.HippoGalleryImageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,22 +77,29 @@ public class DefaultVariantService implements VariantService {
         // key.intern() is a threadsafe way to get the String from the pool maintained by String.
         String key = sourceVariantNode.getParent().getIdentifier() + variantName;
         synchronized (key.intern()){
-            if (hasVariant(sourceVariantNode, variantName)) {
-                Node variantNode = sourceVariantNode.getParent().getNode(variantName);
-
-                if (needsToBeUpdated(variantNode, sourceVariantNode)) {
-                    variantNode.remove();
-                } else {
-                    return variantNode;
-                }
-            }
             try {
+                if (hasVariant(sourceVariantNode, variantName)) {
+                    Node variantNode = sourceVariantNode.getParent().getNode(variantName);
+
+                    if (needsToBeUpdated(variantNode, sourceVariantNode)) {
+                        removeVariant(variantNode);
+                    } else {
+                        return variantNode;
+                    }
+                }
                 return createVariant(sourceVariant, width, height, variantName);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 LOG.error("Failed to create or update image variant at " + sourceVariant.getPath() + "/" + variantName, e);
                 return null;
             }
         }
+    }
+
+    private void removeVariant(final Node variantNode) throws ExecutionException, InterruptedException {
+        RemoveImageVariantJob job = new RemoveImageVariantJob(variantNode);
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(job).get();
+        executor.shutdown(); // This does not cancel the already-scheduled task.
     }
 
     private Node createVariant(HippoGalleryImageBean sourceVariant, int width, int height, String variantName) throws InterruptedException, ExecutionException, TimeoutException {
