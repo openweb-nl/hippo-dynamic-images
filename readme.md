@@ -48,7 +48,7 @@ As you can see it's possible to customize the timeout and the various classes. A
 ```
 Or import taglib for use in Freemarker webfiles
 ```
-<#assign dynimg=JspTaglibs["http://www.finalist.nl/hippo/dynamicimages/taglib"] >
+<#assign dynimg=JspTaglibs["http://www.openweb.nl/hippo/dynamicimages/taglib"] >
 ```
 
 4. Add group _sitewriters_ to domain _hippogallery_

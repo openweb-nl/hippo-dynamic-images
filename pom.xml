@@ -23,26 +23,21 @@
     <name>openweb-dynamic-images</name>
 
     <properties>
-        <!-- taken from https://code.onehippo.org/cms-community/hippo-cms-release/blob/hippo-cms7-release-11.2.3/pom.xml -->
-        <hippo.cms.version>4.2.5</hippo.cms.version>
-        <hippo.repository.version>4.2.2</hippo.repository.version>
-        <hippo.hst.version>4.2.4</hippo.hst.version>
+        <!-- taken from https://github.com/bloomreach/brxm/blob/brxm-13.4.14/release/pom.xml -->
+        <hippo.cms.version>13.4.14</hippo.cms.version>
+        <hippo.repository.version>13.4.14</hippo.repository.version>
+        <hippo.hst.version>13.4.14</hippo.hst.version>
 
-        <!-- https://code.onehippo.org/cms-community/hippo-site-toolkit/blob/hst-4.2.4/pom.xml -->
-        <hippo.jackrabbit.version>2.14.0-h2</hippo.jackrabbit.version>
-
-        <!-- parent of hippo-cms7-release-11.2.3 is hippo-cms7-project-28.7 -->
-        <!-- https://code.onehippo.org/cms-community/hippo-cms-project/blob/hippo-cms7-project-28.7/pom.xml -->
+        <!-- https://github.com/bloomreach/brxm/blob/brxm-13.4.14/site-toolkit/pom.xml -->
+        <hippo.jackrabbit.version>2.21.6-h2</hippo.jackrabbit.version>
         <javax.jcr.version>2.0</javax.jcr.version>
-
-
 
         <java.version>1.8</java.version>
         <jsp-api.version>2.2</jsp-api.version>
-        <servlet-api.version>3.0.1</servlet-api.version>
-        <slf4j.version>1.7.6</slf4j.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <!-- test scope -->
-        <junit.version>4.10</junit.version>
+        <junit.version>4.13.1</junit.version>
         <mockito.version>1.10.19</mockito.version>
 
         <!-- plugins -->
@@ -51,7 +46,7 @@
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
         <maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
-
+        <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
         <!-- settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
@@ -153,6 +148,25 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven.gpg.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven.javadoc.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven.source.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,29 +184,61 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven.source.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven.deploy.plugin.version}</version>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.plugin.version}</version>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:git@github.com:openweb-nl/hippo-dynamic-images.git</connection>
@@ -203,12 +249,12 @@
 
     <distributionManagement>
         <repository>
-            <id>openweb-maven-releases</id>
-            <url>https://maven.open-web.nl/content/repositories/releases/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>openweb-nexus-snapshots</id>
-            <url>https://nexus.open-web.nl/nexus/content/repositories/snapshots/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -227,6 +273,11 @@
                 <role>Lead Developer</role>
             </roles>
         </developer>
+        <developer>
+            <id>joostoudeman</id>
+            <name>Joost Oudeman</name>
+            <email>joost@openweb.nl</email>
+        </developer>
     </developers>
 
     <licenses>
@@ -241,7 +292,7 @@
         <repository>
             <id>hippo</id>
             <name>Hippo Maven 2</name>
-            <url>http://maven.onehippo.com/maven2/</url>
+            <url>https://maven.onehippo.com/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -250,10 +301,5 @@
             </releases>
             <layout>default</layout>
         </repository>
-        <repository>
-            <id>openweb-maven-releases</id>
-            <url>https://maven.open-web.nl/content/repositories/releases/</url>
-        </repository>
-
     </repositories>
 </project>
