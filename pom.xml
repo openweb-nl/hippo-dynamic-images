@@ -18,7 +18,7 @@
 
     <groupId>nl.openweb.hippo</groupId>
     <artifactId>dynamic-images</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <name>openweb-dynamic-images</name>
     <description>A plugin designed for easy image handling in BrXM. With this plugin image sizes are defined in the view template and variants are generated on-the-fly when a link to the variant is created.</description>
@@ -240,7 +240,7 @@
         <connection>scm:git:git@github.com:openweb-nl/hippo-dynamic-images.git</connection>
         <developerConnection>scm:git:git@github.com:openweb-nl/hippo-dynamic-images.git</developerConnection>
         <url>https://github.com/openweb-nl/hippo-dynamic-images</url>
-        <tag>1.0.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
