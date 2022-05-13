@@ -21,7 +21,8 @@
     <version>1.0.2-SNAPSHOT</version>
 
     <name>openweb-dynamic-images</name>
-
+    <description>A plugin designed for easy image handling in BrXM. With this plugin image sizes are defined in the view template and variants are generated on-the-fly when a link to the variant is created.</description>
+    <url>https://github.com/openweb-nl/hippo-dynamic-images</url>
     <properties>
         <!-- taken from https://github.com/bloomreach/brxm/blob/brxm-13.4.14/release/pom.xml -->
         <hippo.cms.version>13.4.14</hippo.cms.version>
